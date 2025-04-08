@@ -1,4 +1,4 @@
-from sqlalchemy import Select
+from sqlalchemy import Select, insert, update
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -16,3 +16,11 @@ class Schedule(Base):
         statement = Select(Schedule.duty_persons).where(Schedule.id_chat == id_chat)
         result = await session.execute(statement)
         return result.scalars().all()
+
+    async def add_pair(self, id_chat: str, pairs: dict[int: str], session: AsyncSession):
+        if not await self.get_all_duty_persons(id_chat, session):
+            statement = insert(Schedule).values(id_chat=id_chat, duty_persons=pairs)
+        else:
+            statement = update(Schedule).values(id_chat=id_chat, duty_persons=pairs)
+        await session.execute(statement)
+        await session.commit()
