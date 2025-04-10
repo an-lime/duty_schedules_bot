@@ -5,7 +5,7 @@ from aiogram.types import TelegramObject
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from databases.database_main import Database
-from databases.models import Schedule
+from databases.models import DutyLists
 
 
 class DatabaseMiddleware(BaseMiddleware):
@@ -18,6 +18,6 @@ class DatabaseMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any]) -> Any:
         async with self.session() as session:
-            db = Database(session=session, schedule=Schedule())
+            db = Database(session=session, duty_lists=DutyLists())
             data['db'] = db
             return await handler(event, data)
